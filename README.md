@@ -82,3 +82,4 @@ recruitment_platform/
 ## Auteur
 
 **Yassine Alahyane**
+Cybersecurity Engineering Student
