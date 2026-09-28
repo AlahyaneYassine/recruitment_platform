@@ -1,0 +1,42 @@
+{% extends 'base/base_candidate.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Postuler à l'offre: {{ job.title }}</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.first_name.label_tag }}
+            {{ form.first_name }}
+        </div>
+        <div class="mb-3">
+            {{ form.last_name.label_tag }}
+            {{ form.last_name }}
+        </div>
+        <div class="mb-3">
+            {{ form.email.label_tag }}
+            {{ form.email }}
+        </div>
+        <div class="mb-3">
+            {{ form.phone_number.label_tag }}
+            {{ form.phone_number }}
+        </div>
+        <div class="mb-3">
+            {{ form.cover_letter.label_tag }}
+            {{ form.cover_letter }}
+            <small class="form-text text-muted">
+                Formats acceptés: PDF, DOC, DOCX
+            </small>
+        </div>
+        <div class="mb-3">
+            {{ form.cv.label_tag }}
+            {{ form.cv }}
+            <small class="form-text text-muted">
+                Formats acceptés: PDF, DOC, DOCX
+            </small>
+        </div>
+        <button type="submit" class="btn btn-primary">Soumettre ma candidature</button>
+        <a href="{% url 'jobs:job_detail' job.slug %}" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+{% endblock %}

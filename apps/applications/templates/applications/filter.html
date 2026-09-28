@@ -1,0 +1,39 @@
+{% extends 'base/base_recruiter.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Filtrer les candidatures</h2>
+    <form method="get">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label for="status" class="form-label">Statut</label>
+                <select class="form-select" id="status" name="status">
+                    <option value="">Tous</option>
+                    {% for value, label in status_choices %}
+                    <option value="{{ value }}" 
+                        {% if value == request.GET.status %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="job" class="form-label">Offre d'emploi</label>
+                <select class="form-select" id="job" name="job">
+                    <option value="">Toutes</option>
+                    {% for job in jobs %}
+                    <option value="{{ job.id }}" 
+                        {% if job.id|stringformat:"s" == request.GET.job %}selected{% endif %}>
+                        {{ job.title }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary">Filtrer</button>
+                <a href="?" class="btn btn-secondary ms-2">Réinitialiser</a>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

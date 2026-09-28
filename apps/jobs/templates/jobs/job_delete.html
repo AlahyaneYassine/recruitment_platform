@@ -1,0 +1,31 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card border-danger shadow">
+                <div class="card-body p-5 text-center">
+                    <h2 class="card-title text-danger mb-4">Confirmer la suppression</h2>
+                    <p class="lead">
+                        Êtes-vous sûr de vouloir supprimer définitivement l'offre :<br>
+                        <strong>"{{ job.title }}"</strong> ?
+                    </p>
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center mt-4">
+                            <a href="{% url 'jobs:job_detail' job.pk %}" class="btn btn-outline-secondary me-md-2">
+                                Annuler
+                            </a>
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Confirmer la suppression
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

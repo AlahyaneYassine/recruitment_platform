@@ -1,0 +1,112 @@
+{% extends "base/base.html" %} 
+{% block content %} 
+<div class="container py-5"> 
+    <h1 class="mb-4">Gestion de mes offres</h1>
+    
+    <!-- Filtres -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label for="status" class="form-label">Statut des offres</label>
+                    <select name="status" id="status" class="form-select">
+                        <option value="">Tous</option>
+                        <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Actives</option>
+                        <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactives</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="job_type" class="form-label">Type de contrat</label>
+                    <select name="job_type" id="job_type" class="form-select">
+                        <option value="">Tous</option>
+                        {% for type in JOB_TYPES %}
+                        <option value="{{ type.0 }}" {% if request.GET.job_type == type.0 %}selected{% endif %}>{{ type.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="location" class="form-label">Localisation</label>
+                    <input type="text" name="location" id="location" class="form-control" 
+                           value="{{ request.GET.location }}" placeholder="Ville ou région">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">Filtrer</button>
+                    <a href="{% url 'jobs:job_manage' %}" class="btn btn-outline-secondary">Réinitialiser</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Titre</th>
+                    <th>Type</th>
+                    <th>Localisation</th>
+                    <th>Statut</th>
+                    <th>Date</th>
+                    <th class="text-center">Nombre des Candidatures</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for job in jobs %}
+                <tr>
+                    <td>{{ job.title }}</td>
+                    <td>{{ job.get_job_type_display }}</td>
+                    <td>{{ job.location }}</td>
+                    <td>
+                        <span class="badge {% if job.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                            {{ job.is_active|yesno:"Active,Inactive" }}
+                        </span>
+                    </td>
+                    <td>{{ job.created_at|date:"d/m/Y" }}</td>
+                   <td class="text-center">
+    {{ job.applications.count }}
+    <!-- 
+    <span class="badge bg-warning text-dark" title="En attente">{{ job.pending_count }}</span>
+    <span class="badge bg-info" title="Examinées">{{ job.reviewed_count }}</span>
+    <span class="badge bg-secondary" title="Entretien">{{ job.interview_count }}</span>
+    <span class="badge bg-success" title="Acceptées">{{ job.accepted_count }}</span>
+    <span class="badge bg-danger" title="Rejetées">{{ job.rejected_count }}</span>
+    -->
+</td>
+
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{% url 'jobs:job_update' job.pk %}" class="btn btn-warning">Modifier</a>
+                            <a href="{% url 'jobs:job_delete' job.pk %}" class="btn btn-danger">Supprimer</a>
+                          <a href="{% url 'applications:application_list_for_job' job_id=job.id %}" 
+   class="btn btn-info position-relative">
+   Voir
+   {% if job.pending_count > 0 %}
+   <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+       {{ job.pending_count }}
+   </span>
+   {% endif %}
+</a>
+
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" class="text-center py-4">
+                        <div class="alert alert-info">
+                            {% if request.GET %}
+                                Aucune offre ne correspond à vos critères de recherche.
+                                <a href="{% url 'jobs:job_manage' %}" class="alert-link">Réinitialiser les filtres</a>
+                            {% else %}
+                                Vous n'avez pas encore publié d'offres d'emploi.
+                                <a href="{% url 'jobs:job_create' %}" class="alert-link">Créer une offre</a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

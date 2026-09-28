@@ -1,0 +1,137 @@
+{% extends "base/base.html" %}
+
+{% block title %}Messages - EASYCAND{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'messaging:inbox' %}">
+                            <i class="fas fa-inbox me-2"></i>Boîte de réception
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'messaging:sent_messages' %}">
+                            <i class="fas fa-paper-plane me-2"></i>Messages envoyés
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'messaging:send_message' %}">
+                            <i class="fas fa-edit me-2"></i>Nouveau message
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">Boîte de réception</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a href="{% url 'messaging:send_message' %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-plus me-1"></i> Nouveau message
+                    </a>
+                </div>
+            </div>
+
+            <!-- Message list -->
+            <div class="list-group">
+                {% for message in message_list %}
+                <a href="{% url 'messaging:message_detail' message.id %}" 
+                   class="list-group-item list-group-item-action {% if not message.read_at %}list-group-item-primary{% endif %}">
+                    <div class="d-flex w-100 justify-content-between">
+                        <div>
+                            <h5 class="mb-1">
+                                {% if not message.read_at %}<strong>{% endif %}
+                                {{ message.subject|truncatechars:50 }}
+                                {% if not message.read_at %}</strong>{% endif %}
+                            </h5>
+                            <p class="mb-1">
+                                <span class="text-muted">De :</span> 
+                                {{ message.sender.get_full_name }}
+                            </p>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted">{{ message.sent_at|date:"d/m/Y H:i" }}</small>
+                            {% if not message.read_at %}
+                            <span class="badge bg-primary ms-2">Nouveau</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <p class="mb-1 text-muted">{{ message.body|truncatechars:100 }}</p>
+                </a>
+                {% empty %}
+                <div class="list-group-item text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Aucun message</h4>
+                    <p>Votre boîte de réception est vide</p>
+                    <a href="{% url 'messaging:send_message' %}" class="btn btn-primary mt-2">
+                        Envoyer votre premier message
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">&laquo; Première</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Précédent</a>
+                    </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Suivant</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Dernière &raquo;</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .sidebar {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+    }
+    .list-group-item-action:hover {
+        background-color: #f8f9fa;
+    }
+    .unread {
+        background-color: rgba(13, 110, 253, 0.1);
+    }
+</style>
+{% endblock %}

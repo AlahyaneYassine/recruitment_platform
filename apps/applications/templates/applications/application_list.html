@@ -1,0 +1,69 @@
+{% extends 'base/base_candidate.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{% if request.user.is_recruiter %}Gestion des candidatures{% else %}Mes candidatures{% endif %}</h2>
+    
+    <!-- Formulaire de filtrage par statut -->
+    <form method="get" action="{% url 'applications:application_list' %}">
+        <div class="mb-3">
+            <label for="status" class="form-label">Filtrer par statut</label>
+            <select name="status" id="status" class="form-select">
+                <option value="">Tous les statuts</option>
+                <option value="PENDING" {% if status_filter == 'PENDING' %}selected{% endif %}>En attente</option>
+                <option value="REVIEWED" {% if status_filter == 'REVIEWED' %}selected{% endif %}>Examinée</option>
+                <option value="INTERVIEW" {% if status_filter == 'INTERVIEW' %}selected{% endif %}>Entretien</option>
+                <option value="ACCEPTED" {% if status_filter == 'ACCEPTED' %}selected{% endif %}>Acceptée</option>
+                <option value="REJECTED" {% if status_filter == 'REJECTED' %}selected{% endif %}>Rejetée</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Filtrer</button>
+    </form>
+
+    {% if applications %}
+    <div class="list-group mt-3">
+        {% for app in applications %}
+        <div class="list-group-item">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ app.job.title }}</h5>
+                <span class="badge bg-{{ app.get_status_color }}">
+                    {{ app.get_status_display }}
+                </span>
+            </div>
+            <p class="mb-1">{{ app.job.recruiter.recruiter.company_name }}</p>
+            <small>Postulé le {{ app.applied_date|date:"d/m/Y" }}</small>
+            <div class="mt-2">
+<div class="d-flex flex-column" style="gap: 8px;">
+    <a href="{% url 'applications:application_detail' app.pk %}" 
+       class="btn btn-sm btn-primary" 
+       style="transition: all 0.2s ease;">
+        Voir les détails
+    </a>
+    
+    <a href="http://127.0.0.1:8000/accounts/profile/candidate/" 
+       class="btn btn-sm btn-secondary" 
+       style="transition: all 0.2s ease;">
+        Retour au profil
+    </a>
+</div>
+                {% if request.user.is_recruiter and request.user == app.job.recruiter %}
+                <a href="{% url 'applications:update_status' app.pk %}" 
+                   class="btn btn-sm btn-warning">
+                    Modifier statut
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        {% if request.user.is_recruiter %}
+        Aucune candidature reçue pour le moment.
+        {% else %}
+        Vous n'avez postulé à aucune offre pour le moment.
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

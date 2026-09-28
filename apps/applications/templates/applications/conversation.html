@@ -1,0 +1,41 @@
+{% extends 'base/base_candidate.html' %}
+{% block content %}
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4>Conversation - {{ application.job.title }}</h4>
+            <a href="{% url 'messaging:message_list' %}" class="btn btn-sm btn-outline-secondary">
+                Retour à la boîte de réception
+            </a>
+        </div>
+        
+        <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+            {% for message in message_list %}
+            <div class="mb-3 {% if message.sender == request.user %}text-end{% endif %}">
+                <div class="d-flex {% if message.sender == request.user %}justify-content-end{% else %}justify-content-start{% endif %}">
+                    <div class="{% if message.sender == request.user %}bg-primary text-white{% else %}bg-light{% endif %} p-3 rounded" style="max-width: 70%;">
+                        <p class="mb-1">{{ message.content }}</p>
+                        <small class="text-muted">
+                            {{ message.timestamp|timesince }} ago
+                            {% if message.sender == request.user %}
+                                {% if message.is_read %}(Lu){% else %}(Envoyé){% endif %}
+                            {% endif %}
+                        </small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="card-footer">
+            <form method="post">
+                {% csrf_token %}
+                <div class="input-group">
+                    {{ form.content }}
+                    <button class="btn btn-primary" type="submit">Envoyer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

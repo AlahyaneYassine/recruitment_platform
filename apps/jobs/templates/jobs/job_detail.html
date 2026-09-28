@@ -1,0 +1,99 @@
+{% extends "base/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <article class="card mb-4">
+                <div class="card-body">
+                    <h1 class="card-title">{{ job.title }}</h1>
+                    <h5 class="card-subtitle mb-3 text-muted">
+                        {% if job.recruiter.recruiter %}
+                            {{ job.recruiter.recruiter.company_name }} • <i class="bi bi-geo-alt"></i> {{ job.location }}
+                        {% else %}
+                            {% trans "Recruteur inconnu" %} • <i class="bi bi-geo-alt"></i> {{ job.location }}
+                        {% endif %}
+                    </h5>
+                    
+                    <div class="d-flex gap-2 mb-4">
+                        <span class="badge bg-primary"><i class="bi bi-briefcase"></i> {{ job.get_job_type_display }}</span>
+                        {% if job.salary %}
+                        <span class="badge bg-success"><i class="bi bi-cash"></i> {{ job.salary }}</span>
+                        {% endif %}
+                    </div>
+
+                    <section class="mb-4">
+                        <h4><i class="bi bi-file-text"></i> {% trans "Description du poste" %}</h4>
+                        <div class="card-text">{{ job.description|linebreaks }}</div>
+                    </section>
+
+                    <section class="mb-4">
+                        <h4><i class="bi bi-list-check"></i> {% trans "Exigences" %}</h4>
+                        <div class="card-text">{{ job.requirements|linebreaks }}</div>
+                    </section>
+
+                    {% if job.application_deadline %}
+                    <p class="text-muted">
+                        <i class="bi bi-calendar-event"></i> 
+                        {% blocktrans with deadline=job.application_deadline|date:"d/m/Y" %}
+                        Date limite de candidature : {{ deadline }}
+                        {% endblocktrans %}
+                    </p>
+                    {% endif %}
+                </div>
+            </article>
+        </div>
+        
+        <div class="col-lg-4">
+            <aside class="card sticky-top" style="top: 20px;">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="bi bi-building"></i> {% trans "À propos du recruteur" %}</h5>
+                    
+                    {% if job.recruiter.recruiter %}
+                        <div class="card-text">
+                            <p><strong>{% trans "Entreprise" %} :</strong> {{ job.recruiter.recruiter.company_name }}</p>
+                            <p><strong>{% trans "Nom" %} :</strong> {{ job.recruiter.get_full_name|default:job.recruiter.username }}</p>
+                            <p><strong>{% trans "Email" %} :</strong> {{ job.recruiter.email }}</p>
+                            <p><strong>{% trans "Description" %} :</strong></p>
+                            <p>{{ job.recruiter.recruiter.company_description|default:_("Aucune description fournie")|linebreaksbr }}</p>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">{% trans "Aucune information sur le recruteur." %}</p>
+                    {% endif %}
+
+                    <!-- Section bouton Postuler améliorée -->
+                    {% if request.user.is_candidate %}
+                        {% if already_applied %}
+                            <div class="alert alert-info">
+                                <i class="bi bi-check-circle"></i> {% trans "Vous avez déjà postulé à cette offre" %}
+                                <a href="{% url 'applications:application_list' %}" class="alert-link d-block mt-2">
+                                    <i class="bi bi-eye"></i> {% trans "Voir ma candidature" %}
+                                </a>
+                            </div>
+                        {% else %}
+                            <a href="{% url 'applications:apply_job' job.pk %}" 
+                               class="btn btn-primary w-100 mb-3"
+                               aria-label="{% trans 'Postuler à cette offre' %}">
+                                <i class="bi bi-send"></i> {% trans "Postuler maintenant" %}
+                            </a>
+                        {% endif %}
+                    {% elif not user.is_authenticated %}
+                        <a href="{% url 'jobs:job_detail' job.slug %}" class="btn btn-outline-secondary">
+                           class="btn btn-outline-primary w-100 mb-3">
+                            <i class="bi bi-box-arrow-in-right"></i> {% trans "Connectez-vous pour postuler" %}
+                        </a>
+                    {% endif %}
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+<div class="text-center mt-4">
+    <a href="{% url 'jobs:job_list' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Retour
+    </a>
+</div>
+
+{% endblock %}

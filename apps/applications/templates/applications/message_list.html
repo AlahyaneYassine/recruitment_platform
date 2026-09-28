@@ -1,0 +1,33 @@
+{% extends 'base/base_candidate.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Boîte de réception</h2>
+    
+    <div class="list-group mt-4">
+        {% for thread in message_threads %}
+        <a href="{% url 'messaging:conversation' thread.application.id %}" 
+           class="list-group-item list-group-item-action {% if not thread.is_read and thread.recipient == request.user %}list-group-item-primary{% endif %}">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">
+                    {% if request.user.is_candidate %}
+                        {{ thread.application.job.recruiter.get_full_name }}
+                    {% else %}
+                        {{ thread.application.candidate.get_full_name }}
+                    {% endif %}
+                </h5>
+                <small>{{ thread.timestamp|timesince }}</small>
+            </div>
+            <p class="mb-1">{{ thread.content|truncatechars:100 }}</p>
+            <small>Offre: {{ thread.application.job.title }}</small>
+            {% if not thread.is_read and thread.recipient == request.user %}
+                <span class="badge bg-primary float-end">Nouveau</span>
+            {% endif %}
+        </a>
+        {% empty %}
+        <div class="alert alert-info">
+            Aucun message pour le moment.
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

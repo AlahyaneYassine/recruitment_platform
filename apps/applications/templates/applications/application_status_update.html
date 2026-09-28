@@ -1,0 +1,24 @@
+{% extends 'base/base_recruiter.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Modifier le statut de la candidature</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label for="status" class="form-label">Nouveau statut</label>
+            <select class="form-select" id="status" name="status">
+                {% for value, label in status_choices %}
+                <option value="{{ value }}" 
+                    {% if value == application.status %}selected{% endif %}>
+                    {{ label }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a href="{% url 'applications:application_detail' application.pk %}" 
+           class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+{% endblock %}

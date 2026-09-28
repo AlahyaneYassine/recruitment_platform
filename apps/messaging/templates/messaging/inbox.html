@@ -1,0 +1,24 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Boîte de réception</h2>
+    
+    
+    <div class="list-group">
+        {% for message in message_list %}
+        <a href="{% url 'messaging:message_detail' message.id %}" 
+           class="list-group-item list-group-item-action {% if not message.read_at %}font-weight-bold{% endif %}">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1">{{ message.subject }}</h5>
+                <small>{{ message.sent_at|date:"d/m/Y H:i" }}</small>
+            </div>
+            <p class="mb-1">De: {{ message.sender.get_full_name }}</p>
+            <small>{{ message.body|truncatechars:100 }}</small>
+        </a>
+        {% empty %}
+        <div class="list-group-item">Aucun message</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

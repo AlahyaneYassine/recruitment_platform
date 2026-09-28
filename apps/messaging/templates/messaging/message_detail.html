@@ -1,0 +1,33 @@
+{% extends "base/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ message.subject }}</h2>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            De: {{ message.sender.get_full_name }} 
+            <span class="float-right">{{ message.sent_at|date:"d/m/Y H:i" }}</span>
+        </div>
+        <div class="card-body">
+            <p class="card-text">{{ message.body|linebreaks }}</p>
+        </div>
+    </div>
+    
+
+    
+    {% if message.parent_message %}
+    <hr>
+    <h4>Message précédent</h4>
+    <div class="card mt-3">
+        <div class="card-header">
+            De: {{ message.parent_message.sender.get_full_name }}
+            <span class="float-right">{{ message.parent_message.sent_at|date:"d/m/Y H:i" }}</span>
+        </div>
+        <div class="card-body">
+            <p class="card-text">{{ message.parent_message.body|linebreaks }}</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

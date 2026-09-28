@@ -1,0 +1,31 @@
+{% extends "base/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="mb-4">Connexion Candidat</h2>
+            
+            {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+            
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-primary btn-block">Se connecter</button>
+            </form>
+            
+            <div class="mt-3 text-center">
+                <a href="{% url 'accounts:password_reset' %}" class="text-muted">Mot de passe oublié ?</a> | 
+                <a href="{% url 'accounts:candidate_signup' %}">Créer un compte</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

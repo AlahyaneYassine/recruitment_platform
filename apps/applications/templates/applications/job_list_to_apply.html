@@ -1,0 +1,20 @@
+{% extends 'base/base_candidate.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Offres d'emploi disponibles</h2>
+
+    {% for job in jobs %}
+        <div class="card my-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ job.title }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ job.location }} | {{ job.get_job_type_display }}</h6>
+                <p class="card-text">{{ job.description|truncatewords:30 }}</p>
+                <a href="{% url 'applications:apply_job' job.id %}" class="btn btn-primary">Postuler</a>
+            </div>
+        </div>
+    {% empty %}
+        <p>Aucune offre disponible pour le moment.</p>
+    {% endfor %}
+</div>
+{% endblock %}
